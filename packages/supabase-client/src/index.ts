@@ -2,41 +2,57 @@ import { createClient, SupabaseClient } from '@supabase/supabase-js';
 
 let supabaseInstance: SupabaseClient | null = null;
 
+function getEnvVariable(baseName: string): string | undefined {
+  const prefixes = ['NEXT_PUBLIC_', 'EXPO_PUBLIC_'];
+  if (typeof window !== 'undefined') {
+    // Browser or Expo environment
+    for (const prefix of prefixes) {
+      const envVar = (window as any)[`${prefix}${baseName}`];
+      if (envVar) return envVar;
+    }
+    // Check without prefix for browser if NEXT_PUBLIC_ or EXPO_PUBLIC_ not found (less common)
+    return (window as any)[baseName];
+  } else {
+    // Node.js environment
+    for (const prefix of prefixes) {
+      const envVar = process.env[`${prefix}${baseName}`];
+      if (envVar) return envVar;
+    }
+    // Check without prefix for Node.js
+    return process.env[baseName];
+  }
+}
+
 export function getSupabaseClient(): SupabaseClient {
   if (supabaseInstance) {
     return supabaseInstance;
   }
 
-  const supabaseUrl = typeof window !== 'undefined' 
-    ? process.env.NEXT_PUBLIC_SUPABASE_URL || (window as any).EXPO_PUBLIC_SUPABASE_URL
-    : process.env.NEXT_PUBLIC_SUPABASE_URL || process.env.EXPO_PUBLIC_SUPABASE_URL;
-    
-  const supabaseAnonKey = typeof window !== 'undefined'
-    ? process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || (window as any).EXPO_PUBLIC_SUPABASE_ANON_KEY
-    : process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || process.env.EXPO_PUBLIC_SUPABASE_ANON_KEY;
+  const supabaseUrl = getEnvVariable('SUPABASE_URL');
+  const supabaseAnonKey = getEnvVariable('SUPABASE_ANON_KEY');
 
   if (!supabaseUrl || !supabaseAnonKey) {
-    // In a real app, you might want to throw an error or handle this more gracefully.
-    // For development, a warning might be sufficient if some parts of the app can run without Supabase.
-    console.error(
-      'Supabase URL or Anon Key is missing. Please check your environment variables (e.g., .env file and prefixes like NEXT_PUBLIC_ or EXPO_PUBLIC_).'
-    );
-    // Fallback to a dummy client or throw an error to prevent app misbehavior
-    // This is a placeholder; adjust error handling as needed.
-    throw new Error('Supabase client could not be initialized: Credentials missing.');
+    const errorMessage = `Supabase client could not be initialized: SUPABASE_URL or SUPABASE_ANON_KEY is missing. 
+    Please ensure these are set in your environment variables. 
+    For web, use NEXT_PUBLIC_SUPABASE_URL / NEXT_PUBLIC_SUPABASE_ANON_KEY.
+    For Expo, use EXPO_PUBLIC_SUPABASE_URL / EXPO_PUBLIC_SUPABASE_ANON_KEY.
+    Check your .env file and ensure it's loaded correctly.`;
+    console.error(errorMessage);
+    // This error will halt execution, which is appropriate if Supabase is critical.
+    throw new Error('Supabase credentials missing, client initialization failed.');
   }
 
   supabaseInstance = createClient(supabaseUrl, supabaseAnonKey);
   return supabaseInstance;
 }
 
-// Export the client directly if you prefer a singleton initialized on module load.
-// However, the getSupabaseClient function allows for more flexible initialization,
-// especially if env vars might not be available immediately at module load time in all environments.
+// Export the client directly for easy import as a singleton.
+// getSupabaseClient() ensures it's initialized only once.
 export const supabase = getSupabaseClient();
 
-// You can also export types for your database schema if you generate them
-// For example:
+// Example for future reference:
+// To use generated types from your Supabase schema (after running supabase gen types typescript):
+// import { Database } from './your-generated-types-file'; // Adjust path as needed
+// supabaseInstance = createClient<Database>(supabaseUrl, supabaseAnonKey);
 // export type Tables<T extends keyof Database['public']['Tables']> = Database['public']['Tables'][T]['Row'];
 // export type Enums<T extends keyof Database['public']['Enums']> = Database['public']['Enums'][T];
-// This requires generating types from your Supabase schema first.

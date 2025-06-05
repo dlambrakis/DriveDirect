@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "build": "turbo build",
-    "dev": "turbo dev",
+    "dev": "concurrently -n \"WEB,EXPO\" -c \"bgBlue.bold,bgMagenta.bold\" \"pnpm --filter @directdrive/web-app dev\" \"pnpm --filter @directdrive/expo-app dev\"",
     "lint": "turbo lint",
     "format": "prettier --write \"**/*.{ts,tsx,js,jsx,md,json}\" --ignore-path .gitignore",
     "test": "turbo test",
@@ -13,6 +13,7 @@
   "devDependencies": {
     "@typescript-eslint/eslint-plugin": "^7.10.0",
     "@typescript-eslint/parser": "^7.10.0",
+    "concurrently": "^9.0.0",
     "eslint": "^8.57.0",
     "eslint-config-prettier": "^9.1.0",
     "prettier": "^3.2.5",

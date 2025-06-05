@@ -30,6 +30,12 @@ export default function RootLayout({
       >
         {/* You can add a ThemeProvider here if you plan to support light/dark mode toggle */}
         {children}
+        {/* Note: Two toaster components are currently included (Sonner and Radix). 
+            Consider standardizing on one for consistency and to potentially reduce bundle size,
+            unless both serve distinct, intended purposes.
+            SonnerToaster is often used for more dynamic/rich notifications.
+            RadixToaster is the default provided by Shadcn/ui.
+        */}
         <SonnerToaster richColors />
         <RadixToaster />
       </body>
