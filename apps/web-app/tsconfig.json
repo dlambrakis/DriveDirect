@@ -1,0 +1,30 @@
+{
+  "extends": "../../tsconfig.base.json",
+  "compilerOptions": {
+    "plugins": [{ "name": "next" }],
+    "baseUrl": ".",
+    "paths": {
+      "@/components/*": ["../../components/*"], // Resolve to monorepo root components
+      "@/hooks/*": ["../../hooks/*"],           // Resolve to monorepo root hooks (if any shared)
+      "@/lib/*": ["./lib/*"],                   // App-specific lib
+      "@/app/*": ["./app/*"],                   // App-specific app directory
+      "@/*": ["./*"]                            // Fallback for other app-specific paths (e.g. ./public)
+    },
+    "target": "es5",
+    "lib": ["dom", "dom.iterable", "esnext"],
+    "allowJs": true,
+    "noEmit": true,
+    "module": "esnext",
+    "moduleResolution": "bundler",
+    "jsx": "preserve",
+    "incremental": true,
+    "isolatedModules": true
+  },
+  "include": [
+    "next-env.d.ts",
+    "**/*.ts",
+    "**/*.tsx",
+    ".next/types/**/*.ts"
+  ],
+  "exclude": ["node_modules", ".next", "dist"]
+}

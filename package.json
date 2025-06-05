@@ -1,0 +1,23 @@
+{
+  "name": "directdrive-monorepo",
+  "version": "0.0.0",
+  "private": true,
+  "scripts": {
+    "build": "turbo build",
+    "dev": "turbo dev",
+    "lint": "turbo lint",
+    "format": "prettier --write \"**/*.{ts,tsx,js,jsx,md,json}\" --ignore-path .gitignore",
+    "test": "turbo test",
+    "clean": "rm -rf node_modules .turbo apps/*/node_modules apps/*/.next apps/*/dist packages/*/node_modules packages/*/dist"
+  },
+  "devDependencies": {
+    "@typescript-eslint/eslint-plugin": "^7.10.0",
+    "@typescript-eslint/parser": "^7.10.0",
+    "eslint": "^8.57.0",
+    "eslint-config-prettier": "^9.1.0",
+    "prettier": "^3.2.5",
+    "turbo": "^2.0.9",
+    "typescript": "~5.4.5"
+  },
+  "packageManager": "pnpm@9.1.1"
+}
